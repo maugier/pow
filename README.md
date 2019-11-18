@@ -24,6 +24,7 @@ Here's a Rust program to compute the proof-of-work
 ## Usage
 
     cargo build --release
+    cargo test --release
     ./target/relase/pow sha256 15 1a2b3c
 
 [CRYPTOCTF]: https://cryp.toc.tf

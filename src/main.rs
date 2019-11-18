@@ -59,3 +59,20 @@ fn brute<H: Digest>(mut hash: H, len: usize, target: &[u8]) -> String {
         hash.reset();
     }
 }
+
+#[test]
+fn try_short_target() {
+    let len = 10;
+    let target = [0x1a, 0xb2];
+    let solution = brute(Sha256::new(), 10, &target);
+
+    assert_eq!(solution.len(), len);
+
+    let mut out = [0; 32];
+    let mut hash = Sha256::new();
+    hash.input(solution.as_bytes());
+    hash.result(&mut out);
+
+    assert_eq!(&out[30..32], &target);
+
+}
