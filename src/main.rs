@@ -3,12 +3,7 @@ use {
         digest::Digest,
         md5::Md5,
         sha1::Sha1,
-        sha2::{
-            Sha224,
-            Sha256,
-            Sha384,
-            Sha512,
-        },
+        sha2::{Sha224,Sha256,Sha384,Sha512},
     },
     rand::{
         distributions::Alphanumeric,
@@ -27,11 +22,9 @@ fn main() {
     let len: usize = args[2].parse().expect("length must be a number");
     let target = hex::decode(args[3].as_bytes()).expect("Cannot understand target");
 
-    println!("Attacking {:?} {}", target, len);
-
     let answer: String = match args[1].as_ref() {
-        "md5" => brute(Md5::new(), len, &target),
-        "sha1" => brute(Sha1::new(), len, &target),
+        "md5"    => brute(Md5::new(), len, &target),
+        "sha1"   => brute(Sha1::new(), len, &target),
         "sha224" => brute(Sha224::new(), len, &target),
         "sha256" => brute(Sha256::new(), len, &target),
         "sha384" => brute(Sha384::new(), len, &target),
