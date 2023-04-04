@@ -1,10 +1,9 @@
 use {
-    crypto::{
-        digest::Digest,
-        md5::Md5,
-        sha1::Sha1,
-        sha2::{Sha224,Sha256,Sha384,Sha512},
-    },
+    digest::{Digest},
+    md5::Md5,
+    sha1::Sha1,
+    sha2::{Sha224,Sha256,Sha384,Sha512},
+
     rand::{
         distributions::Alphanumeric,
         Rng,
@@ -23,12 +22,12 @@ fn main() {
     let target = hex::decode(args[3].as_bytes()).expect("Cannot understand target");
 
     let answer: String = match args[1].as_ref() {
-        "md5"    => brute(Md5::new(), len, &target),
-        "sha1"   => brute(Sha1::new(), len, &target),
-        "sha224" => brute(Sha224::new(), len, &target),
-        "sha256" => brute(Sha256::new(), len, &target),
-        "sha384" => brute(Sha384::new(), len, &target),
-        "sha512" => brute(Sha512::new(), len, &target),
+        "md5"    => brute::<Md5>(len, &target),
+        "sha1"   => brute::<Sha1>(len, &target),
+        "sha224" => brute::<Sha224>(len, &target),
+        "sha256" => brute::<Sha256>(len, &target),
+        "sha384" => brute::<Sha384>(len, &target),
+        "sha512" => brute::<Sha512>(len, &target),
         _ => panic!("Unknown hash algo"),
     };
 
@@ -37,26 +36,21 @@ fn main() {
 }
 
 
-fn brute<H: Digest>(mut hash: H, len: usize, target: &[u8]) -> String {
+fn brute<H: Digest>(len: usize, target: &[u8]) -> String {
     let mut rng = thread_rng();
-    let outlen = hash.output_bytes();
+    let outlen = <H as Digest>::output_size();
     let tlen = target.len();
-
-    let mut out = vec![0; outlen];
 
     loop {
         let s: String = (0..len)
-            .map(|_| rng.sample(Alphanumeric))
+            .map(|_| rng.sample(Alphanumeric) as char)
             .collect();
 
-        hash.input(s.as_bytes());
-        hash.result(&mut out);
+        let out = H::digest(&s);
 
         if &out[(outlen - tlen)..] == target {
             return s
         }
-
-        hash.reset();
     }
 }
 
